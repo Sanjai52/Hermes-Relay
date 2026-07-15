@@ -27,7 +27,7 @@ async function loadHistory() {
         const tbody = document.getElementById('sms-list');
         tbody.innerHTML = '';
         if (jobs.length === 0 && offset === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#65676b;">No messages yet</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#dbc1ac;">No messages yet</td></tr>';
         }
         jobs.forEach(j => {
             const row = tbody.insertRow();

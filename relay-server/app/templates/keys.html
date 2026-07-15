@@ -43,7 +43,7 @@ async function loadKeys() {
         const tbody = document.getElementById('key-list');
         tbody.innerHTML = '';
         if (keys.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#65676b;">No API keys yet</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#dbc1ac;">No API keys yet</td></tr>';
         }
         keys.forEach(k => {
             const row = tbody.insertRow();
