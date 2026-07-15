@@ -21,5 +21,6 @@ app.include_router(dashboard.router)
 
 
 @app.get("/health")
+@app.get("/ping")
 async def health():
     return {"status": "ok"}
