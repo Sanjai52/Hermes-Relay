@@ -44,3 +44,11 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+# Android build artifacts
+mobile-app/app/build/
+mobile-app/.gradle/
+mobile-app/local.properties
+mobile-app/build/
+*.apk
+*.aab

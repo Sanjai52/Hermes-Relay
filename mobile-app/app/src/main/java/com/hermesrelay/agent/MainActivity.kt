@@ -41,8 +41,7 @@ class MainActivity : ComponentActivity() {
                         onStopService = { homeViewModel.stopService() },
                         onLogout = {
                             homeViewModel.logout()
-                            loginViewModel.updateEmail("")
-                            loginViewModel.updatePassword("")
+                            loginViewModel.logout()
                         }
                     )
                 } else {

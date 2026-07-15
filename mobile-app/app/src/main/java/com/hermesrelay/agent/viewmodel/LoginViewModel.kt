@@ -39,6 +39,15 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
 
+    init {
+        viewModelScope.launch {
+            val token = preferencesManager.getToken()
+            if (token != null) {
+                _isLoggedIn.value = true
+            }
+        }
+    }
+
     fun updateEmail(value: String) { _email.value = value }
     fun updatePassword(value: String) { _password.value = value }
 
@@ -94,5 +103,11 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     fun clearError() {
         _error.value = null
+    }
+
+    fun logout() {
+        _isLoggedIn.value = false
+        _email.value = ""
+        _password.value = ""
     }
 }
