@@ -14,7 +14,7 @@ router = APIRouter(prefix="/api/v1/keys", tags=["keys"])
 
 def generate_api_key() -> tuple[str, str, str]:
     raw = f"hr_{secrets.token_urlsafe(32)}"
-    prefix = raw[:10]
+    prefix = raw[:8]
     return raw, prefix, hash_password(raw)
 
 
