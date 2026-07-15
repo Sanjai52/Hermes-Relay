@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 style="margin-bottom:24px;">SMS History</h1>
+<div class="card">
+    <table>
+        <thead><tr><th>To</th><th>Message</th><th>Status</th><th>Device</th><th>Time</th></tr></thead>
+        <tbody id="sms-list"></tbody>
+    </table>
+    <div style="margin-top:16px;display:flex;gap:8px;justify-content:center;align-items:center;">
+        <button class="btn btn-outline" id="prev-btn" disabled>Previous</button>
+        <span id="page-info">Page 1</span>
+        <button class="btn btn-outline" id="next-btn">Next</button>
+    </div>
+</div>
+
+<script>
+let offset = 0;
+const limit = 25;
+
+async function loadHistory() {
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = '/'; return; }
+
+    try {
+        const res = await fetch(`/api/v1/messages/?limit=${limit}&offset=${offset}`, { headers: { 'Authorization': 'Bearer ' + token } });
+        const jobs = await res.json();
+        const tbody = document.getElementById('sms-list');
+        tbody.innerHTML = '';
+        if (jobs.length === 0 && offset === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#65676b;">No messages yet</td></tr>';
+        }
+        jobs.forEach(j => {
+            const row = tbody.insertRow();
+            row.insertCell().textContent = j.phone_number;
+            row.insertCell().textContent = j.message.length > 50 ? j.message.slice(0,50)+'...' : j.message;
+            row.insertCell().innerHTML = `<span class="badge badge-${j.status}">${j.status}</span>`;
+            row.insertCell().textContent = j.device_id ? j.device_id.slice(0,8)+'...' : '-';
+            row.insertCell().textContent = new Date(j.created_at).toLocaleString();
+        });
+        document.getElementById('prev-btn').disabled = offset === 0;
+        document.getElementById('next-btn').disabled = jobs.length < limit;
+        document.getElementById('page-info').textContent = `Page ${Math.floor(offset/limit) + 1}`;
+    } catch (err) { console.error(err); }
+}
+
+document.getElementById('prev-btn').addEventListener('click', () => { offset = Math.max(0, offset - limit); loadHistory(); });
+document.getElementById('next-btn').addEventListener('click', () => { offset += limit; loadHistory(); });
+
+loadHistory();
+</script>
+{% endblock %}

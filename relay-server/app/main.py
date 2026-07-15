@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.routers import auth, devices, keys, messages, ws
+from app.routers import auth, dashboard, devices, keys, messages, ws
 
 
 @asynccontextmanager
@@ -17,6 +17,7 @@ app.include_router(keys.router)
 app.include_router(devices.router)
 app.include_router(messages.router)
 app.include_router(ws.router)
+app.include_router(dashboard.router)
 
 
 @app.get("/health")

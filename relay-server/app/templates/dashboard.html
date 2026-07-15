@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 style="margin-bottom:24px;">Dashboard</h1>
+<div class="grid">
+    <div class="card"><h3>Devices</h3><div class="value" id="device-count">-</div></div>
+    <div class="card"><h3>Online</h3><div class="value" id="online-count">-</div></div>
+    <div class="card"><h3>Total SMS</h3><div class="value" id="sms-count">-</div></div>
+    <div class="card"><h3>Status</h3><div class="value" id="relay-status" style="font-size:16px;">-</div></div>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom:12px;">Recent Messages</h3>
+    <table>
+        <thead><tr><th>To</th><th>Message</th><th>Status</th><th>Time</th></tr></thead>
+        <tbody id="recent-sms"></tbody>
+    </table>
+    <p style="text-align:center;margin-top:16px;"><a href="/history" class="btn btn-outline">View All History</a></p>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom:12px;">Devices</h3>
+    <table>
+        <thead><tr><th>Name</th><th>Status</th><th>Last Seen</th></tr></thead>
+        <tbody id="device-list"></tbody>
+    </table>
+</div>
+
+<script>
+async function loadDashboard() {
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = '/'; return; }
+
+    try {
+        const statsRes = await fetch('/api/v1/dashboard/stats', { headers: { 'Authorization': 'Bearer ' + token } });
+        const stats = await statsRes.json();
+        document.getElementById('device-count').textContent = stats.device_count;
+        document.getElementById('online-count').textContent = stats.online_devices;
+        document.getElementById('sms-count').textContent = stats.total_sms;
+        document.getElementById('relay-status').textContent = stats.online_devices > 0 ? 'Active' : 'No devices online';
+
+        const tbody = document.getElementById('recent-sms');
+        tbody.innerHTML = '';
+        (stats.recent_sms || []).forEach(j => {
+            const row = tbody.insertRow();
+            row.insertCell().textContent = j.phone_number;
+            row.insertCell().textContent = j.message.length > 40 ? j.message.slice(0,40)+'...' : j.message;
+            row.insertCell().innerHTML = `<span class="badge badge-${j.status}">${j.status}</span>`;
+            row.insertCell().textContent = new Date(j.created_at).toLocaleString();
+        });
+
+        const devRes = await fetch('/api/v1/devices/', { headers: { 'Authorization': 'Bearer ' + token } });
+        const devices = await devRes.json();
+        const devTbody = document.getElementById('device-list');
+        devTbody.innerHTML = '';
+        (devices || []).forEach(d => {
+            const row = devTbody.insertRow();
+            row.insertCell().textContent = d.device_name;
+            row.insertCell().innerHTML = `<span class="badge badge-${d.status}">${d.status}</span>`;
+            row.insertCell().textContent = d.last_seen ? new Date(d.last_seen).toLocaleString() : 'Never';
+        });
+    } catch (err) {
+        console.error(err);
+    }
+}
+loadDashboard();
+</script>
+{% endblock %}

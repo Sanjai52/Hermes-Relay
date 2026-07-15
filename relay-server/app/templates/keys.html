@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 style="margin-bottom:24px;">API Keys</h1>
+<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h3 style="margin:0;">Your API Keys</h3>
+        <button class="btn btn-primary" id="create-key-btn">+ Create Key</button>
+    </div>
+    <table>
+        <thead><tr><th>Name</th><th>Prefix</th><th>Created</th><th>Last Used</th></tr></thead>
+        <tbody id="key-list"></tbody>
+    </table>
+</div>
+
+<div id="key-modal" class="modal-overlay">
+    <div class="modal">
+        <h3 id="modal-title">Create API Key</h3>
+        <form id="create-key-form">
+            <div class="form-group">
+                <label for="key-name">Key Name (optional)</label>
+                <input type="text" id="key-name" placeholder="e.g. Production Server">
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Key</button>
+        </form>
+        <div id="key-result" style="display:none;margin-top:16px;">
+            <p style="color:#c62828;font-size:13px;margin-bottom:8px;">Copy this key now — you won't be able to see it again!</p>
+            <div class="copy-input">
+                <input type="text" id="new-key-value" readonly>
+                <button class="btn btn-primary" id="copy-key-btn">Copy</button>
+            </div>
+        </div>
+        <button class="btn btn-outline" style="margin-top:12px;" id="close-modal-btn">Close</button>
+    </div>
+</div>
+
+<script>
+async function loadKeys() {
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = '/'; return; }
+    try {
+        const res = await fetch('/api/v1/keys/', { headers: { 'Authorization': 'Bearer ' + token } });
+        const keys = await res.json();
+        const tbody = document.getElementById('key-list');
+        tbody.innerHTML = '';
+        if (keys.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#65676b;">No API keys yet</td></tr>';
+        }
+        keys.forEach(k => {
+            const row = tbody.insertRow();
+            row.insertCell().textContent = k.name || '-';
+            row.insertCell().textContent = k.prefix + '...';
+            row.insertCell().textContent = new Date(k.created_at).toLocaleString();
+            row.insertCell().textContent = k.last_used_at ? new Date(k.last_used_at).toLocaleString() : 'Never';
+        });
+    } catch (err) { console.error(err); }
+}
+
+document.getElementById('create-key-btn').addEventListener('click', () => {
+    document.getElementById('key-modal').classList.add('show');
+    document.getElementById('key-result').style.display = 'none';
+    document.getElementById('create-key-form').style.display = 'block';
+    document.getElementById('modal-title').textContent = 'Create API Key';
+});
+
+document.getElementById('close-modal-btn').addEventListener('click', () => {
+    document.getElementById('key-modal').classList.remove('show');
+});
+
+document.getElementById('create-key-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = 'Generating...';
+
+    try {
+        const name = document.getElementById('key-name').value;
+        const res = await fetch('/api/v1/keys/', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name || null })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            document.getElementById('create-key-form').style.display = 'none';
+            document.getElementById('key-result').style.display = 'block';
+            document.getElementById('new-key-value').value = data.raw_key;
+            loadKeys();
+        } else {
+            showToast(data.detail || 'Failed to create key', 'error');
+        }
+    } catch (err) {
+        showToast('Connection failed', 'error');
+    }
+    btn.disabled = false;
+    btn.textContent = 'Generate Key';
+});
+
+document.getElementById('copy-key-btn').addEventListener('click', () => {
+    const input = document.getElementById('new-key-value');
+    input.select();
+    navigator.clipboard.writeText(input.value);
+    showToast('API key copied to clipboard');
+});
+
+loadKeys();
+</script>
+{% endblock %}

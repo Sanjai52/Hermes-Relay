@@ -1,14 +1,32 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth import get_current_user
 from app.database import get_db
 from app.dependencies import get_api_key
-from app.models import ApiKey, Device, SmsJob
-from app.schemas import SendSmsRequest, SendSmsResponse
+from app.models import ApiKey, Device, SmsJob, User
+from app.schemas import SmsJobResponse, SendSmsRequest, SendSmsResponse
 from app.ws.manager import manager
 
 router = APIRouter(prefix="/api/v1/messages", tags=["messages"])
+
+
+@router.get("/", response_model=list[SmsJobResponse])
+async def list_messages(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
+):
+    result = await db.execute(
+        select(SmsJob)
+        .where(SmsJob.user_id == current_user.id)
+        .order_by(SmsJob.created_at.desc())
+        .offset(offset)
+        .limit(limit)
+    )
+    return [SmsJobResponse.model_validate(j) for j in result.scalars().all()]
 
 
 @router.post("/", response_model=SendSmsResponse, status_code=status.HTTP_202_ACCEPTED)
