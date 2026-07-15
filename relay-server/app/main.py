@@ -20,12 +20,7 @@ app.include_router(ws.router)
 app.include_router(dashboard.router)
 
 
-@app.get("/health")
-@app.get("/ping")
+@app.api_route("/health", methods=["GET", "HEAD"])
+@app.api_route("/ping", methods=["GET", "HEAD"])
 async def health():
     return {"status": "ok"}
-
-@app.head("/health")
-@app.head("/ping")
-async def ping():
-    return ""
