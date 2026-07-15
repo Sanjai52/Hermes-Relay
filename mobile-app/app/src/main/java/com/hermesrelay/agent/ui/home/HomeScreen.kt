@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.hermesrelay.agent.data.model.SmsLogEntry
 import com.hermesrelay.agent.ui.theme.Connected
 import com.hermesrelay.agent.ui.theme.Disconnected
 import com.hermesrelay.agent.viewmodel.HomeViewModel
@@ -19,7 +20,7 @@ import com.hermesrelay.agent.viewmodel.HomeViewModel
 @Composable
 fun HomeScreen(
     connectionStatus: String,
-    smsLog: List<HomeViewModel.SmsLogEntry>,
+    smsLog: List<SmsLogEntry>,
     isServiceRunning: Boolean,
     onStartService: () -> Unit,
     onStopService: () -> Unit,
@@ -130,7 +131,7 @@ private fun ConnectionStatusCard(status: String, isRunning: Boolean) {
 }
 
 @Composable
-private fun SmsLogCard(entry: HomeViewModel.SmsLogEntry) {
+private fun SmsLogCard(entry: SmsLogEntry) {
     Card(
         modifier = Modifier.fillMaxWidth()
     ) {

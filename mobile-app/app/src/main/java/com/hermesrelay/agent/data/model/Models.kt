@@ -35,3 +35,10 @@ data class SmsJob(
 data class ApiError(
     val detail: String
 )
+
+data class SmsLogEntry(
+    val jobId: String,
+    val to: String,
+    val message: String,
+    val status: String
+)

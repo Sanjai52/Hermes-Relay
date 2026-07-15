@@ -9,7 +9,6 @@ class ConnectionManager:
         self._connections: dict[UUID, WebSocket] = {}
 
     async def connect(self, device_id: UUID, ws: WebSocket) -> None:
-        await ws.accept()
         self._connections[device_id] = ws
 
     def disconnect(self, device_id: UUID) -> None:

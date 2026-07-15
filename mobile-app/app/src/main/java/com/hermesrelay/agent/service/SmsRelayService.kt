@@ -4,15 +4,16 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.hermesrelay.agent.HermesApp
 import com.hermesrelay.agent.MainActivity
-import com.hermesrelay.agent.R
 import com.hermesrelay.agent.data.PreferencesManager
 import com.hermesrelay.agent.data.model.WsMessage
 import com.hermesrelay.agent.sms.SmsSender
+import com.hermesrelay.agent.data.model.SmsLogEntry
 import com.hermesrelay.agent.websocket.WebSocketClient
 import com.google.gson.Gson
 import kotlinx.coroutines.*
@@ -26,12 +27,28 @@ class SmsRelayService : Service() {
         const val ACTION_STOP = "com.hermesrelay.agent.STOP"
     }
 
+    interface ConnectionCallback {
+        fun onConnectionStateChanged(state: String)
+        fun onSmsLogEntry(entry: SmsLogEntry)
+    }
+
+    inner class LocalBinder : Binder() {
+        fun getService(): SmsRelayService = this@SmsRelayService
+    }
+
+    private val binder = LocalBinder()
+    private var callback: ConnectionCallback? = null
+
+    var currentState: String = "Disconnected"
+        private set
+
     private lateinit var preferencesManager: PreferencesManager
     private lateinit var webSocketClient: WebSocketClient
     private lateinit var smsSender: SmsSender
     private lateinit var gson: Gson
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var messageJob: Job? = null
+    private var stateJob: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -39,6 +56,10 @@ class SmsRelayService : Service() {
         gson = Gson()
         smsSender = SmsSender()
         webSocketClient = WebSocketClient(gson, scope)
+    }
+
+    fun setConnectionCallback(cb: ConnectionCallback) {
+        callback = cb
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -66,6 +87,19 @@ class SmsRelayService : Service() {
                 }
             }
 
+            stateJob?.cancel()
+            stateJob = scope.launch {
+                webSocketClient.connectionState.collect { state ->
+                    val label = when (state) {
+                        WebSocketClient.ConnectionState.DISCONNECTED -> "Disconnected"
+                        WebSocketClient.ConnectionState.CONNECTING -> "Connecting..."
+                        WebSocketClient.ConnectionState.CONNECTED -> "Connected"
+                    }
+                    currentState = label
+                    callback?.onConnectionStateChanged(label)
+                }
+            }
+
             webSocketClient.connect(serverUrl, token)
         }
     }
@@ -76,6 +110,14 @@ class SmsRelayService : Service() {
                 val jobId = msg.jobId ?: return
                 val to = msg.to ?: return
                 val message = msg.message ?: return
+
+                val entry = SmsLogEntry(
+                    jobId = jobId,
+                    to = to,
+                    message = message,
+                    status = "received"
+                )
+                callback?.onSmsLogEntry(entry)
 
                 smsSender.sendSms(to, message) { success, status ->
                     val resultStatus = if (success) "sent" else status
@@ -88,6 +130,7 @@ class SmsRelayService : Service() {
     private fun disconnectAndStop() {
         webSocketClient.disconnect()
         messageJob?.cancel()
+        stateJob?.cancel()
         scope.cancel()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
@@ -110,7 +153,7 @@ class SmsRelayService : Service() {
             .build()
     }
 
-    override fun onBind(intent: Intent?): IBinder? = null
+    override fun onBind(intent: Intent?): IBinder = binder
 
     override fun onDestroy() {
         scope.cancel()

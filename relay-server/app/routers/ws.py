@@ -43,7 +43,7 @@ async def websocket_endpoint(ws: WebSocket):
                 return
 
             result = await db.execute(
-                select(Device).where(Device.user_id == user.id, Device.status == "online").limit(1)
+                select(Device).where(Device.user_id == user.id).limit(1)
             )
             device = result.scalar_one_or_none()
 
