@@ -6,18 +6,20 @@
     <title>Login - Hermes Relay</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .login-card { background: #fff; border-radius: 12px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-        .login-card h1 { font-size: 24px; color: #1a73e8; margin-bottom: 4px; }
-        .login-card p { color: #65676b; margin-bottom: 24px; font-size: 14px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #121212; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .login-card { background: #212121; border-radius: 12px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        .login-card h1 { font-size: 24px; color: #1db954; margin-bottom: 4px; }
+        .login-card p { color: #535353; margin-bottom: 24px; font-size: 14px; }
         .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: #65676b; }
-        .form-group input { width: 100%; padding: 10px 12px; border: 1px solid #dadce0; border-radius: 6px; font-size: 14px; outline: none; }
-        .form-group input:focus { border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.15); }
-        .btn { width: 100%; padding: 10px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; background: #1a73e8; color: #fff; }
-        .btn:hover { background: #1557b0; }
+        .form-group label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: #535353; }
+        .form-group input { width: 100%; padding: 10px 12px; border: 1px solid #535353; border-radius: 6px; font-size: 14px; outline: none; background: #121212; color: #b3b3b3; }
+        .form-group input:focus { border-color: #1db954; box-shadow: 0 0 0 2px rgba(29,185,84,0.15); }
+        .form-group input::placeholder { color: #535353; }
+        .btn { width: 100%; padding: 10px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; background: #1db954; color: #fff; }
+        .btn:hover { background: #169c46; }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .error { color: #c62828; font-size: 13px; margin-bottom: 12px; display: none; }
+        .error { color: #ff453a; font-size: 13px; margin-bottom: 12px; display: none; }
+        a { color: #1db954; }
     </style>
 </head>
 <body>
