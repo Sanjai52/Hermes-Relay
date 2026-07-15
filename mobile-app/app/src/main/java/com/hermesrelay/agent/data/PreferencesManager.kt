@@ -15,7 +15,7 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 class PreferencesManager(private val context: Context) {
 
     val token: Flow<String?> = context.dataStore.data.map { it[TOKEN_KEY] }
-    val serverUrl: Flow<String> = context.dataStore.data.map { it[SERVER_URL_KEY] ?: "ws://10.200.243.137:8000/ws" }
+    val serverUrl: Flow<String> = context.dataStore.data.map { it[SERVER_URL_KEY] ?: "wss://hermes-relay.onrender.com/ws" }
 
     suspend fun saveToken(token: String) {
         context.dataStore.edit { it[TOKEN_KEY] = token }
@@ -31,12 +31,12 @@ class PreferencesManager(private val context: Context) {
         context.dataStore.edit { it[SERVER_URL_KEY] = url }
     }
 
-    suspend fun getServerUrl(): String = context.dataStore.data.first()[SERVER_URL_KEY] ?: "ws://10.200.243.137:8000/ws"
+    suspend fun getServerUrl(): String = context.dataStore.data.first()[SERVER_URL_KEY] ?: "wss://hermes-relay.onrender.com/ws"
 
     companion object {
         private val TOKEN_KEY = stringPreferencesKey("jwt_token")
         private val SERVER_URL_KEY = stringPreferencesKey("server_url")
-        const val DEFAULT_WS_URL = "ws://10.200.243.137:8000/ws"
-        const val DEFAULT_HTTP_URL = "http://10.200.243.137:8000"
+        const val DEFAULT_WS_URL = "wss://hermes-relay.onrender.com/ws"
+        const val DEFAULT_HTTP_URL = "https://hermes-relay.onrender.com"
     }
 }
