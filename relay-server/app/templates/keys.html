@@ -23,7 +23,7 @@
             <button type="submit" class="btn btn-primary">Generate Key</button>
         </form>
         <div id="key-result" style="display:none;margin-top:16px;">
-            <p style="color:#c62828;font-size:13px;margin-bottom:8px;">Copy this key now — you won't be able to see it again!</p>
+            <p style="color:#c0392b;font-size:13px;margin-bottom:8px;">Copy this key now — you won't be able to see it again!</p>
             <div class="copy-input">
                 <input type="text" id="new-key-value" readonly>
                 <button class="btn btn-primary" id="copy-key-btn">Copy</button>
@@ -43,7 +43,7 @@ async function loadKeys() {
         const tbody = document.getElementById('key-list');
         tbody.innerHTML = '';
         if (keys.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#dbc1ac;">No API keys yet</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#967259;">No API keys yet</td></tr>';
         }
         keys.forEach(k => {
             const row = tbody.insertRow();
