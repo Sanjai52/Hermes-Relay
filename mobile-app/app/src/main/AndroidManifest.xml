@@ -5,12 +5,12 @@
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_COMMUNICATION" />
 
     <application
         android:name=".HermesApp"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true"
+        android:icon="@android:drawable/ic_dialog_email"
         android:label="Hermes Relay"
         android:supportsRtl="true"
         android:theme="@style/Theme.HermesRelayAgent">
@@ -27,8 +27,7 @@
 
         <service
             android:name=".service.SmsRelayService"
-            android:exported="false"
-            android:foregroundServiceType="communication" />
+            android:exported="false" />
     </application>
 
 </manifest>

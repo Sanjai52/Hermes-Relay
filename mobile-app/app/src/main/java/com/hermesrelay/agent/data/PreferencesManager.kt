@@ -14,13 +14,8 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 
 class PreferencesManager(private val context: Context) {
 
-    companion object {
-        private val TOKEN_KEY = stringPreferencesKey("jwt_token")
-        private val SERVER_URL_KEY = stringPreferencesKey("server_url")
-    }
-
     val token: Flow<String?> = context.dataStore.data.map { it[TOKEN_KEY] }
-    val serverUrl: Flow<String> = context.dataStore.data.map { it[SERVER_URL_KEY] ?: DEFAULT_WS_URL }
+    val serverUrl: Flow<String> = context.dataStore.data.map { it[SERVER_URL_KEY] ?: "ws://10.200.243.137:8000" }
 
     suspend fun saveToken(token: String) {
         context.dataStore.edit { it[TOKEN_KEY] = token }
@@ -36,10 +31,12 @@ class PreferencesManager(private val context: Context) {
         context.dataStore.edit { it[SERVER_URL_KEY] = url }
     }
 
-    suspend fun getServerUrl(): String = context.dataStore.data.first()[SERVER_URL_KEY] ?: DEFAULT_WS_URL
+    suspend fun getServerUrl(): String = context.dataStore.data.first()[SERVER_URL_KEY] ?: "ws://10.200.243.137:8000"
 
     companion object {
-        const val DEFAULT_WS_URL = "ws://10.0.2.2:8000"
-        const val DEFAULT_HTTP_URL = "http://10.0.2.2:8000"
+        private val TOKEN_KEY = stringPreferencesKey("jwt_token")
+        private val SERVER_URL_KEY = stringPreferencesKey("server_url")
+        const val DEFAULT_WS_URL = "ws://10.200.243.137:8000"
+        const val DEFAULT_HTTP_URL = "http://10.200.243.137:8000"
     }
 }

@@ -87,6 +87,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             val response = conn.inputStream.bufferedReader().readText()
             return gson.fromJson(response, LoginResponse::class.java)
         }
+        val errorBody = try { conn.errorStream?.bufferedReader()?.readText() } catch (e: Exception) { null }
+        _error.value = errorBody ?: "Server returned $code"
         return null
     }
 

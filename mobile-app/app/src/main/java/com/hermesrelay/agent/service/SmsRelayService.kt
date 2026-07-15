@@ -37,7 +37,7 @@ class SmsRelayService : Service() {
         super.onCreate()
         preferencesManager = PreferencesManager(this)
         gson = Gson()
-        smsSender = SmsSender(this)
+        smsSender = SmsSender()
         webSocketClient = WebSocketClient(gson, scope)
     }
 

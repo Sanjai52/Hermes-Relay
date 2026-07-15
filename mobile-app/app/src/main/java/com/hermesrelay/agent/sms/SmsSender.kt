@@ -1,11 +1,10 @@
 package com.hermesrelay.agent.sms
 
-import android.content.Context
 import android.telephony.SmsManager
 import android.util.Log
 import java.util.concurrent.Executors
 
-class SmsSender(private val context: Context) {
+class SmsSender {
     companion object {
         private const val TAG = "SmsSender"
     }
@@ -19,7 +18,7 @@ class SmsSender(private val context: Context) {
     ) {
         executor.execute {
             try {
-                val smsManager = context.getSystemService(Context.SMS_SERVICE) as SmsManager
+                val smsManager = SmsManager.getDefault()
                 smsManager.sendTextMessage(phoneNumber, null, message, null, null)
                 Log.d(TAG, "SMS sent to $phoneNumber")
                 onResult(true, "sent")

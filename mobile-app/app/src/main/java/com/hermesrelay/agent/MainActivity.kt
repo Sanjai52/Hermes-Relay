@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.hermesrelay.agent.data.PreferencesManager
 import com.hermesrelay.agent.ui.home.HomeScreen
 import com.hermesrelay.agent.ui.login.LoginScreen
 import com.hermesrelay.agent.ui.theme.HermesRelayTheme
