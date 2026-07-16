@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
                         onStartService = { homeViewModel.startService() },
                         onStopService = { homeViewModel.stopService() },
                         onLogout = {
-                            homeViewModel.logout()
+                            runCatching { homeViewModel.logout() }
                             loginViewModel.logout()
                         }
                     )

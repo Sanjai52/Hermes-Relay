@@ -105,6 +105,8 @@ class WebSocketClient(
     }
 
     fun disconnect() {
+        currentUrl = null
+        currentToken = null
         reconnectJob?.cancel()
         ws?.close(1000, "Client closing")
         ws = null

@@ -71,9 +71,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun logout() {
-        stopService()
         viewModelScope.launch {
             preferencesManager.clearToken()
         }
+        runCatching { stopService() }
     }
 }
