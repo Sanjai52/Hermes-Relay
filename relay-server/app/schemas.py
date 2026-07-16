@@ -1,7 +1,9 @@
+import re
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr
+import phonenumbers
+from pydantic import BaseModel, EmailStr, field_validator
 
 
 # ---------- Auth ----------
@@ -71,6 +73,24 @@ class DeviceResponse(BaseModel):
 class SendSmsRequest(BaseModel):
     to: str
     message: str
+
+    @field_validator("to")
+    @classmethod
+    def validate_phone(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Phone number is required")
+        if v.startswith("+"):
+            try:
+                parsed = phonenumbers.parse(v, None)
+                if not phonenumbers.is_valid_number(parsed):
+                    raise ValueError("Invalid phone number")
+            except phonenumbers.NumberParseException:
+                raise ValueError("Invalid phone number format")
+        else:
+            if not re.fullmatch(r"\d{7,15}", v):
+                raise ValueError("Phone number must be 7-15 digits")
+        return v
 
 
 class SendSmsResponse(BaseModel):
